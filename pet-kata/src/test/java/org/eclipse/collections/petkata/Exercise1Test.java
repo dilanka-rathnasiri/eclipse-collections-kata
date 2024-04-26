@@ -75,9 +75,13 @@ public class Exercise1Test extends PetDomainForKata
     public void getPeopleWithoutCats()
     {
         // Replace null, with a negative filtering method on MutableList.
-        MutableList<Person> peopleWithoutCats = null;  // this.people...
+        MutableList<Person> peopleWithoutCats = this.people.select(
+                person -> person.getPets().select(
+                        pet -> pet.getType() == PetType.CAT
+                ).isEmpty()
+        ); ;  // this.people...
 
-        var expectedFirstNames = Lists.mutable.with("Smith", "Snake", "Bird", "Turtle", "Hamster", "Doe");
-        Assertions.assertEquals(expectedFirstNames, peopleWithoutCats.collect(Person::getLastName));
+        var expectedFirstNames = Lists.mutable.with("Ted", "Jake", "Barry", "Terry", "Harry", "John");
+        Assertions.assertEquals(expectedFirstNames, peopleWithoutCats.collect(Person::getFirstName));
     }
 }
