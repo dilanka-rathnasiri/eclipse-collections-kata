@@ -12,12 +12,16 @@ package org.eclipse.collections.petkata;
 
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.predicate.Predicate;
+import org.eclipse.collections.api.block.predicate.Predicate2;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.test.Verify;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.BiFunction;
 
 /**
  * In the slides leading up to this exercise you should have learned about the following APIs.
@@ -27,61 +31,42 @@ import org.junit.jupiter.api.Test;
  *
  * @see <a href="http://eclipse.github.io/eclipse-collections-kata/pet-kata/#/2">Exercise 1 Slides</a>
  */
-public class Exercise1Test extends PetDomainForKata
-{
+public class Exercise1Test extends PetDomainForKata {
     @Test
     @Tag("KATA")
-    public void getFirstNamesOfAllPeople()
-    {
-        // Replace null, with a transformation method on MutableList.
-        MutableList<String> firstNames = this.people.collect(Person::getFirstName); // this.people...
-
+    public void getFirstNamesOfAllPeople() {
+        MutableList<String> firstNames = this.people.collect(Person::getFirstName);
         var expectedFirstNames = Lists.mutable.with("Mary", "Bob", "Ted", "Jake", "Barry", "Terry", "Harry", "John");
         Assertions.assertEquals(expectedFirstNames, firstNames);
     }
 
     @Test
     @Tag("KATA")
-    public void getNamesOfMarySmithsPets()
-    {
-        Person person = this.getPersonNamed("Mary Smith");
-        MutableList<Pet> pets = person.getPets();
-
-        // Replace null, with a transformation method on MutableList.
-        MutableList<String> names = pets.collect(Pet::getName); // pets...
-
-        Assertions.assertEquals("Tabby", names.makeString());
+    public void getNamesOfMarySmithsPets() {
+        String actualName = this.getPersonNamed("Mary Smith")
+                .getPets()
+                .collect(Pet::getName)
+                .makeString();
+        Assertions.assertEquals("Tabby", actualName);
     }
 
     @Test
     @Tag("KATA")
     @DisplayName("getPeopleWithCats 🐱")
-    public void getPeopleWithCats()
-    {
-        // Replace null, with a positive filtering method on MutableList.
-        MutableList<Person> peopleWithCats = this.people.select(
-                person -> !person.getPets().select(
-                        pet -> pet.getType() == PetType.CAT
-                ).isEmpty()
-        );  // this.people...
-
+    public void getPeopleWithCats() {
+        var peopleWithCats = this.people.selectWith(Person::hasPet, PetType.CAT)
+                .collect(Person::getFirstName);
         var expectedFirstNames = Lists.mutable.with("Mary", "Bob");
-        Assertions.assertEquals(expectedFirstNames, peopleWithCats.collect(Person::getFirstName));
+        Assertions.assertEquals(expectedFirstNames, peopleWithCats);
     }
 
     @Test
     @Tag("KATA")
     @DisplayName("getPeopleWithoutCats 🐱")
-    public void getPeopleWithoutCats()
-    {
-        // Replace null, with a negative filtering method on MutableList.
-        MutableList<Person> peopleWithoutCats = this.people.select(
-                person -> person.getPets().select(
-                        pet -> pet.getType() == PetType.CAT
-                ).isEmpty()
-        ); ;  // this.people...
-
+    public void getPeopleWithoutCats() {
+        var personsWithoutCats = this.people.rejectWith(Person::hasPet, PetType.CAT)
+                .collect(Person::getFirstName);
         var expectedFirstNames = Lists.mutable.with("Ted", "Jake", "Barry", "Terry", "Harry", "John");
-        Assertions.assertEquals(expectedFirstNames, peopleWithoutCats.collect(Person::getFirstName));
+        Assertions.assertEquals(expectedFirstNames, personsWithoutCats);
     }
 }
