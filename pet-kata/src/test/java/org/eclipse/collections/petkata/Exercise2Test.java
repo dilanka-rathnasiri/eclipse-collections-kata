@@ -52,35 +52,30 @@ public class Exercise2Test extends PetDomainForKata
     @Test
     @Tag("KATA")
     @DisplayName("doAnyPeopleHaveCats 🐱?")
-    public void doAnyPeopleHaveCats()
-    {
-        Predicate<Person> predicate = null; //replace null with a Predicate lambda which checks for PetType.CAT
+    public void doAnyPeopleHaveCats() {
+        Predicate<Person> predicate = person -> person.hasPet(PetType.CAT);
         Assertions.assertTrue(this.people.anySatisfy(predicate));
     }
 
     @Test
     @Tag("KATA")
-    public void doAllPeopleHavePets()
-    {
+    public void doAllPeopleHavePets() {
         Predicate<Person> predicate = Person::isPetPerson;
-        boolean result = true; //replace with a method call send to this.people that checks if all people have pets
-        Assertions.assertFalse(result);
+        Assertions.assertFalse(this.people.allSatisfy(predicate));
     }
 
     @Test
     @Tag("KATA")
     @DisplayName("howManyPeopleHaveCats 🐱?")
-    public void howManyPeopleHaveCats()
-    {
-        int count = 0;
+    public void howManyPeopleHaveCats() {
+        int count = this.people.selectWith(Person::hasPet, PetType.CAT).size();
         Assertions.assertEquals(2, count);
     }
 
     @Test
     @Tag("KATA")
-    public void findMarySmith()
-    {
-        Person result = null;
+    public void findMarySmith() {
+        Person result = this.people.selectWith(Person::named, "Mary Smith").getOnly();
         Assertions.assertEquals("Mary", result.getFirstName());
         Assertions.assertEquals("Smith", result.getLastName());
     }
