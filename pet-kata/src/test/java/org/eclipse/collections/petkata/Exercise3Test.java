@@ -130,7 +130,7 @@ public class Exercise3Test extends PetDomainForKata {
 
         // Hint: use the appropriate method on this.people with a target collection to create a MutableSetMultimap<String, Person>
         // Hint: this.people is a MutableList, so it will return a MutableListMultimap without a target collection
-        MutableSetMultimap<PetType, Person> multimap = null;
+        MutableSetMultimap<PetType, Person> multimap = this.people.groupByEach(Person::getPetTypes, Multimaps.mutable.set.empty());
 
         Verify.assertIterableSize(2, multimap.get(PetType.CAT));
         Verify.assertIterableSize(2, multimap.get(PetType.DOG));
@@ -145,7 +145,7 @@ public class Exercise3Test extends PetDomainForKata {
     public void getPeopleByTheirPetEmojis() {
         // Hint: use the same approach you used in the method above for petTypes only this time with petEmojis
         // Hint: there is a method name getPetEmojis on the Person class
-        MutableSetMultimap<String, Person> petTypesToPeople = null;
+        MutableSetMultimap<String, Person> petTypesToPeople = this.people.groupByEach(Person::getPetEmojis, Multimaps.mutable.set.empty());
 
         Verify.assertIterableSize(2, petTypesToPeople.get("🐱"));
         Verify.assertIterableSize(2, petTypesToPeople.get("🐶"));
