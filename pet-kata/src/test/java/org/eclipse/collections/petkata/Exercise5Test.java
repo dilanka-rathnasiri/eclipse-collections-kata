@@ -10,9 +10,6 @@
 
 package org.eclipse.collections.petkata;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.DoubleFunction;
@@ -22,7 +19,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.MutableDoubleList;
 import org.eclipse.collections.api.partition.list.PartitionMutableList;
 import org.eclipse.collections.api.set.primitive.MutableIntSet;
-import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
 import org.eclipse.collections.impl.test.Verify;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * In these tests, you will be able to discover some additional methods available on the Eclipse Collections API.
- *
+ * <p>
  * {@link MutableList#partition(Predicate)}<br>
  * {@link PartitionMutableList#getSelected()}<br>
  * {@link PartitionMutableList#getRejected()}<br>
@@ -43,13 +39,11 @@ import org.junit.jupiter.api.Test;
  * {@link MutableList#collectInt(IntFunction)}<br>
  * {@link MutableBag#selectDuplicates()}<br>
  */
-public class Exercise5Test extends PetDomainForKata
-{
+public class Exercise5Test extends PetDomainForKata {
     @Test
     @Tag("KATA")
-    public void partitionPetAndNonPetPeople()
-    {
-        PartitionMutableList<Person> partitionMutableList = null;
+    public void partitionPetAndNonPetPeople() {
+        PartitionMutableList<Person> partitionMutableList = this.people.partition(Person::isPetPerson);
         Verify.assertSize(7, partitionMutableList.getSelected());
         Verify.assertSize(1, partitionMutableList.getRejected());
     }
@@ -57,27 +51,25 @@ public class Exercise5Test extends PetDomainForKata
     @Test
     @Tag("KATA")
     @DisplayName("getOldestPet - 🐶")
-    public void getOldestPet()
-    {
-        Pet oldestPet = null;
+    public void getOldestPet() {
+        Pet oldestPet = this.people.flatCollect(Person::getPets).maxBy(Pet::getAge);
         Assertions.assertEquals(PetType.DOG, oldestPet.getType());
         Assertions.assertEquals(4, oldestPet.getAge());
     }
 
     @Test
     @Tag("KATA")
-    public void getAveragePetAge()
-    {
-        double averagePetAge = 0;
+    public void getAveragePetAge() {
+        double averagePetAge = this.people.flatCollect(Person::getPets).collectInt(Pet::getAge).average();
         Assertions.assertEquals(1.88888, averagePetAge, 0.00001);
     }
 
     @Test
     @Tag("KATA")
-    public void addPetAgesToExistingSet()
-    {
+    public void addPetAgesToExistingSet() {
         // Hint: Use petAges as a target collection
         MutableIntSet petAges = IntSets.mutable.with(5);
+        this.people.flatCollect(Person::getPets).collectInt(Pet::getAge, petAges);
 
         var expectedSet = IntSets.mutable.with(1, 2, 3, 4, 5);
         Assertions.assertEquals(expectedSet, petAges);
@@ -86,11 +78,10 @@ public class Exercise5Test extends PetDomainForKata
     @Test
     @Tag("KATA")
     @DisplayName("findOwnerWithMoreThanOnePetOfTheSameType - 🐹 🐹")
-    public void findOwnerWithMoreThanOnePetOfTheSameType()
-    {
+    public void findOwnerWithMoreThanOnePetOfTheSameType() {
         /* Hint: find the owner with a short circuit detect . Use a predicate
         that utilizes Bags to find duplicates of a given pet type*/
-        Person petOwner = null;
+        Person petOwner = this.people.detect(person -> person.getPetTypes().anySatisfyWithOccurrences((petType, i) -> i>1));
 
         Assertions.assertEquals("Harry Hamster", petOwner.getFullName());
         Assertions.assertEquals("🐹 🐹", petOwner.getPets().makeString(" "));
