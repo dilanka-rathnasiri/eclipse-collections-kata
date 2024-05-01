@@ -1,21 +1,18 @@
-target
-build
-.maven
-.gradle
-eclipse-collections-kata-parent.userlibraries
-eclipse-collections-kata.userlibraries
-gradle.prefs
-bin
-.settings
-.classpath
-.project
+**/target
+**/build
+**/.maven
+**/.gradle
+**/eclipse-collections-kata-parent.userlibraries
+**/eclipse-collections-kata.userlibraries
+**/gradle.prefs
+**/bin
+**/.settings
+**/.classpath
+**/.project
 
 # IntelliJ IDEA ignores
-.idea/modules.xml
-.idea/workspace.xml
-.idea/libraries
-.idea/gradle.xml
-*.iml
-*.ipr
-*.iws
+**/.idea
+**/*.iml
+**/*.ipr
+**/*.iws
 

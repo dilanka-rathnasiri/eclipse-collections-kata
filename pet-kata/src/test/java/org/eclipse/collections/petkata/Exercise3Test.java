@@ -21,8 +21,11 @@ import org.eclipse.collections.api.factory.Bags;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.api.multimap.Multimap;
+import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.multimap.set.MutableSetMultimap;
+import org.eclipse.collections.api.multimap.set.SetMultimap;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
@@ -46,23 +49,19 @@ import org.junit.jupiter.api.Test;
  *
  * @see <a href="http://eclipse.github.io/eclipse-collections-kata/pet-kata/#/6">Exercise 3 Slides</a>
  */
-public class Exercise3Test extends PetDomainForKata
-{
+public class Exercise3Test extends PetDomainForKata {
     @Test
     @Tag("KATA")
-    public void getCountsByPetEmojis()
-    {
+    public void getCountsByPetEmojis() {
         MutableList<PetType> petTypes = this.people.flatCollect(Person::getPets)
                 .collect(Pet::getType);
 
         // Do you recognize this pattern? Can you simplify it using Java Streams?
         MutableMap<String, Long> petEmojiCounts = Maps.mutable.empty();
-        for (PetType petType : petTypes)
-        {
+        for (PetType petType : petTypes) {
             String petEmoji = petType.toString();
             Long count = petEmojiCounts.get(petEmoji);
-            if (count == null)
-            {
+            if (count == null) {
                 count = 0L;
             }
             petEmojiCounts.put(petEmoji, count + 1L);
@@ -72,7 +71,7 @@ public class Exercise3Test extends PetDomainForKata
         Assertions.assertEquals(expectedMap, petEmojiCounts);
 
         // Use the appropriate method on this.people to create a Bag<String> with Pet emojis
-        Bag<String> counts = null;
+        Bag<String> counts = this.people.flatCollect(Person::getPets).collect(Pet::toString).toBag();
 
         var expected = Bags.mutable.withOccurrences("🐱", 2, "🐶", 2, "🐹", 2)
                 .with("🐍")
@@ -83,16 +82,13 @@ public class Exercise3Test extends PetDomainForKata
 
     @Test
     @Tag("KATA")
-    public void getPeopleByLastName()
-    {
+    public void getPeopleByLastName() {
         // Do you recognize this pattern?
         MutableMap<String, MutableList<Person>> lastNamesToPeople = Maps.mutable.empty();
-        for (Person person : this.people)
-        {
+        for (Person person : this.people) {
             String lastName = person.getLastName();
             MutableList<Person> peopleWithLastName = lastNamesToPeople.get(lastName);
-            if (peopleWithLastName == null)
-            {
+            if (peopleWithLastName == null) {
                 peopleWithLastName = Lists.mutable.empty();
                 lastNamesToPeople.put(lastName, peopleWithLastName);
             }
@@ -101,27 +97,23 @@ public class Exercise3Test extends PetDomainForKata
         Verify.assertIterableSize(3, lastNamesToPeople.get("Smith"));
 
         // Hint: use the appropriate method on this.people to create a Multimap<String, Person>
-        Multimap<String, Person> byLastNameMultimap = null;
+        Multimap<String, Person> byLastNameMultimap = this.people.groupBy(Person::getLastName);
 
         Verify.assertIterableSize(3, byLastNameMultimap.get("Smith"));
     }
 
     @Test
     @Tag("KATA")
-    public void getPeopleByTheirPetTypes()
-    {
+    public void getPeopleByTheirPetTypes() {
         Map<PetType, Set<Person>> peopleByPetType = Maps.mutable.empty();
 
         // Do you recognize this pattern? Is there a matching pattern for this in Java Streams?
-        for (Person person : this.people)
-        {
+        for (Person person : this.people) {
             List<Pet> pets = person.getPets();
-            for (Pet pet : pets)
-            {
+            for (Pet pet : pets) {
                 PetType petType = pet.getType();
                 Set<Person> peopleWithPetType = peopleByPetType.get(petType);
-                if (peopleWithPetType == null)
-                {
+                if (peopleWithPetType == null) {
                     peopleWithPetType = Sets.mutable.empty();
                     peopleByPetType.put(petType, peopleWithPetType);
                 }
@@ -138,7 +130,7 @@ public class Exercise3Test extends PetDomainForKata
 
         // Hint: use the appropriate method on this.people with a target collection to create a MutableSetMultimap<String, Person>
         // Hint: this.people is a MutableList, so it will return a MutableListMultimap without a target collection
-        MutableSetMultimap<PetType, Person> multimap = null;
+        MutableSetMultimap<PetType, Person> multimap = this.people.groupByEach(Person::getPetTypes, Multimaps.mutable.set.empty());
 
         Verify.assertIterableSize(2, multimap.get(PetType.CAT));
         Verify.assertIterableSize(2, multimap.get(PetType.DOG));
@@ -150,11 +142,10 @@ public class Exercise3Test extends PetDomainForKata
 
     @Test
     @Tag("KATA")
-    public void getPeopleByTheirPetEmojis()
-    {
+    public void getPeopleByTheirPetEmojis() {
         // Hint: use the same approach you used in the method above for petTypes only this time with petEmojis
         // Hint: there is a method name getPetEmojis on the Person class
-        MutableSetMultimap<String, Person> petTypesToPeople = null;
+        MutableSetMultimap<String, Person> petTypesToPeople = this.people.groupByEach(Person::getPetEmojis, Multimaps.mutable.set.empty());
 
         Verify.assertIterableSize(2, petTypesToPeople.get("🐱"));
         Verify.assertIterableSize(2, petTypesToPeople.get("🐶"));
