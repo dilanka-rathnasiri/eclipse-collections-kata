@@ -12,29 +12,33 @@ package org.eclipse.collections.petkata;
 
 import java.util.AbstractMap;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
-import org.eclipse.collections.api.factory.Bags;
 import org.eclipse.collections.api.factory.list.primitive.MutableIntListFactory;
 import org.eclipse.collections.api.factory.set.primitive.MutableIntSetFactory;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.primitive.ImmutableIntList;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.block.factory.primitive.IntPredicates;
+import org.eclipse.collections.impl.factory.Bags;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
 import org.eclipse.collections.impl.test.Verify;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import javax.lang.model.type.PrimitiveType;
 
 import static java.lang.Math.abs;
 
@@ -124,56 +128,20 @@ public class Exercise4Test extends PetDomainForKata {
     @Tag("KATA")
     @DisplayName("topThreePets - 🐱 🐶 🐹")
     public void topThreePets() {
-        Assertions.fail("Refactor to Eclipse Collections. Don't forget to comment this out or delete it when you are done.");
-
-        // Hint: The result of groupingBy/counting can almost always be replaced by a Bag
-        // Hint: Look for the API on Bag that might return the top 3 pet types
-        var favorites = this.people
-                .stream()
-                .flatMap(p -> p.getPets().stream())
-                .collect(Collectors.groupingBy(Pet::getType, Collectors.counting()))
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparingLong(e -> -e.getValue()))
-                .limit(3L)
-                .collect(Collectors.toList());
+        var favorites = this.people.flatCollect(Person::getPets).countBy(Pet::getType).topOccurrences(3).sortThis();
 
         Verify.assertSize(3, favorites);
 
-        // Hint: Look at PrimitiveTuples.pair(Object, int)
-        Verify.assertContains(2, favorites);
-        Verify.assertContains(new AbstractMap.SimpleEntry<>(PetType.DOG, Long.valueOf(2)), favorites);
-        Verify.assertContains(new AbstractMap.SimpleEntry<>(PetType.HAMSTER, Long.valueOf(2)), favorites);
+        Verify.assertContains(PrimitiveTuples.pair(PetType.CAT, 2), favorites);
+        Verify.assertContains(PrimitiveTuples.pair(PetType.DOG, 2), favorites);
+        Verify.assertContains(PrimitiveTuples.pair(PetType.HAMSTER, 2), favorites);
     }
 
     @Test
     @Tag("KATA")
     public void getMedianOfPetAges() {
-        Assertions.fail("Refactor to Eclipse Collections. Don't forget to comment this out or delete it when you are done.");
-
         // Try to use a MutableIntList here instead
-        // Hints: flatMap = flatCollect, map = collect, mapToInt = collectInt
-        var petAges = this.people
-                .stream()
-                .map(Person::getPets)
-                .flatMap(List::stream)
-                .mapToInt(Pet::getAge)
-                .boxed()
-                .collect(Collectors.toList());
-
-        // Try to refactor the code block finding the median the JDK way
-        // Use the EC median method
-        var sortedPetAges = petAges.stream().sorted().collect(Collectors.toList());
-
-        double median;
-        if (0 == sortedPetAges.size() % 2) {
-            // The median of a list of even numbers is the average of the two middle items
-            median = sortedPetAges.stream().skip((sortedPetAges.size() / 2) - 1).limit(2L).mapToInt(i -> i).average().getAsDouble();
-        } else {
-            // The median of a list of odd numbers is the middle item
-            median = sortedPetAges.get(abs(sortedPetAges.size() / 2)).doubleValue();
-        }
-
+        double median = this.people.flatCollect(Person::getPets).collectInt(Pet::getAge).median();
         Assertions.assertEquals(2.0, median, 0.0);
     }
 }
